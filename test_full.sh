@@ -237,9 +237,14 @@ then pass "Lexicographical order"
 else fail "Lexicographical order"
 fi
 
-if [ "`./ls -r src | head -1`" = "sort.c" ]
-then pass "Reverse order"
-else fail "Reverse order"
+NORMAL_LAST=`./ls src | tail -1`
+REVERSE_FIRST=`./ls -r src | head -1`
+
+if [ "$NORMAL_LAST" = "$REVERSE_FIRST" ]
+then
+    pass "Reverse order"
+else
+    fail "Reverse order"
 fi
 
 if ./ls -A "$TEST_DIR" | grep -q "^\.hidden$"
