@@ -206,8 +206,7 @@ static int display_path(const char *path,
     /*
      * Hien thi noi dung thu muc.
      */
-    if (options->blocks || options->long_format)
-        display_total(files, count, options);
+    display_total(files, count, options);
     display_files(files, count, options);
 
     /*
