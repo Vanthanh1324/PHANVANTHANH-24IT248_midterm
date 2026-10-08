@@ -7,7 +7,6 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/types.h>
 
 static char get_type_char(mode_t mode)
 {
