@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 
 static char get_type_char(mode_t mode)
 {
@@ -24,6 +25,10 @@ static char get_type_char(mode_t mode)
         return 's';
     if (S_ISFIFO(mode))
         return 'p';
+#ifdef S_ISWHT
+    if (S_ISWHT(mode))
+        return 'w';
+#endif
 
     return '?';
 }
@@ -148,6 +153,10 @@ static void print_classification(const FileInfo *file)
         putchar('=');
     else if (S_ISFIFO(mode))
         putchar('|');
+#ifdef S_ISWHT
+    else if (S_ISWHT(mode))
+        putchar('%');
+#endif
     else if (S_ISREG(mode) &&
              (mode & (S_IXUSR | S_IXGRP | S_IXOTH)))
         putchar('*');
@@ -272,7 +281,17 @@ void display_file(const FileInfo *file, const Options *options)
             printf("%lu ", (unsigned long)file->st.st_gid);
     }
 
-    print_size(file->st.st_size, options);
+    if (S_ISCHR(file->st.st_mode) || S_ISBLK(file->st.st_mode))
+    {
+        printf("%u,%u ",
+               (unsigned int)major(file->st.st_rdev),
+               (unsigned int)minor(file->st.st_rdev));
+    }
+    else
+    {
+        print_size(file->st.st_size, options);
+        putchar(' ');
+    }
 
     print_time(file, options);
 
