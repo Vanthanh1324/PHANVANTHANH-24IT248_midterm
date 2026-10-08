@@ -132,3 +132,44 @@ Build tool: Make
 PHAN VAN THANH
 
 Mã sinh viên: 24IT248
+
+
+## 10. Kiểm thử
+
+Project có script:
+
+    ./test_full.sh
+
+Script kiểm tra:
+
+- Biên dịch bằng Makefile.
+- Các option `-A -a -c -d -F -f -h -i -k -l -n -q -R -r -S -s -t -u -w`.
+- Các tổ hợp option.
+- Các option có tính chất override như `-q/-w`, `-c/-u`, `-R/-d`, `-k/-h`, `-S/-t`.
+- Sắp xếp xuôi/ngược, theo thời gian và kích thước.
+- Nhiều file/thư mục operand.
+- Đệ quy.
+- File thường, executable, symbolic link và FIFO.
+- File ẩn với `-a` và `-A`.
+- Xử lý đường dẫn không tồn tại và option không hợp lệ.
+- Kiểm tra output của `-l`, `-i` và output cơ bản.
+
+Chạy:
+
+    sh test_full.sh
+
+## 11. Thiết kế chương trình
+
+Chương trình được chia thành các module:
+
+- `main.c`: xử lý operand, thư mục và đệ quy.
+- `options.c`: phân tích command-line options.
+- `fileinfo.c`: lấy thông tin file bằng `lstat()`.
+- `sort.c`: sắp xếp theo tên, thời gian hoặc kích thước.
+- `display.c`: định dạng output, long format, inode, block, owner/group và ký hiệu `-F`.
+
+Các file header tương ứng nằm trong thư mục `include/`.
+
+## 12. Tham khảo
+
+Hành vi của chương trình được đối chiếu với yêu cầu trong đề bài Midterm Project và tài liệu `ls(1)` của NetBSD.
