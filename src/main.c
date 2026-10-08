@@ -48,18 +48,18 @@ static int load_directory(const char *path,
     {
         FileInfo info;
 
-        if (!options->all && !options->almost_all)
-        {
-            if (is_hidden(entry->d_name))
-                continue;
-        }
+        if (!options->all && !options->almost_all &&
+            is_hidden(entry->d_name))
+            continue;
 
-        if (options->almost_all)
-        {
-            if (strcmp(entry->d_name, ".") == 0 ||
-                strcmp(entry->d_name, "..") == 0)
-                continue;
-        }
+        /*
+         * -a includes . and .., so it takes precedence over -A.
+         * -A (and the super-user default) excludes only these two.
+         */
+        if (!options->all && options->almost_all &&
+            (strcmp(entry->d_name, ".") == 0 ||
+             strcmp(entry->d_name, "..") == 0))
+            continue;
 
         if (*count >= capacity)
         {
@@ -311,17 +311,35 @@ int main(int argc, char **argv)
     result = 0;
     if (options.directory)
     {
-        for (i = first_file; i < argc; i++)
+        char **operands;
+        int count;
+
+        count = argc - first_file;
+        operands = malloc(sizeof(char *) * count);
+
+        if (operands == NULL)
+            return 1;
+
+        for (i = 0; i < count; i++)
+            operands[i] = argv[first_file + i];
+
+        if (!options.unsorted && count > 1)
         {
-            if (display_path(argv[i],
+            operand_options = &options;
+            qsort(operands, count, sizeof(char *),
+                  compare_operand_names);
+        }
+
+        for (i = 0; i < count; i++)
+        {
+            if (display_path(operands[i],
                              &options,
                              0,
                              0) != 0)
-            {
                 result = 1;
-            }
         }
 
+        free(operands);
         return result;
     }
 
