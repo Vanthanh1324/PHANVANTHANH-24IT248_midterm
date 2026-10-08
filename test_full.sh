@@ -229,7 +229,59 @@ else fail "Inode output contains main.c"
 fi
 
 echo ""
-echo "11. Cleanup"
+echo "11. Semantic checks"
+echo "--------------------------------------"
+
+if [ "`./ls src | head -1`" = "display.c" ]
+then pass "Lexicographical order"
+else fail "Lexicographical order"
+fi
+
+if [ "`./ls -r src | head -1`" = "sort.c" ]
+then pass "Reverse order"
+else fail "Reverse order"
+fi
+
+if ./ls -A "$TEST_DIR" | grep -q "^\.hidden$"
+then pass "-A includes hidden"
+else fail "-A includes hidden"
+fi
+
+if ./ls -A "$TEST_DIR" | grep -q "^\.\.$"
+then fail "-A includes .."
+else pass "-A excludes .."
+fi
+
+if ./ls -a "$TEST_DIR" | grep -q "^\.$" &&
+   ./ls -a "$TEST_DIR" | grep -q "^\.\.$"
+then pass "-a includes . and .."
+else fail "-a includes . and .."
+fi
+
+if ./ls -F "$TEST_DIR" | grep -q "executable\*$" &&
+   ./ls -F "$TEST_DIR" | grep -q "link@$" &&
+   ./ls -F "$TEST_DIR" | grep -q "fifo|$"
+then pass "-F classification"
+else fail "-F classification"
+fi
+
+if ./ls -n "$TEST_DIR" | grep -q "^[^ ]*[[:space:]]*[0-9]"
+then pass "-n numeric long format"
+else fail "-n numeric long format"
+fi
+
+if BLOCKSIZE=1024 ./ls -s "$TEST_DIR" >/dev/null 2>&1
+then pass "BLOCKSIZE environment"
+else fail "BLOCKSIZE environment"
+fi
+
+if TZ=UTC ./ls -l "$TEST_DIR" >/dev/null 2>&1
+then pass "TZ environment"
+else fail "TZ environment"
+fi
+
+echo ""
+echo "12. Cleanup"
 echo "--------------------------------------"
 
 rm -rf "$TEST_DIR"
